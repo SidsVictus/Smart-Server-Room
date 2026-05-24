@@ -209,12 +209,12 @@ export default function App() {
   }, [triggerNextTick]);
 
   const handleExport = () => {
-    const headerRow1 = ['timestamp', 'temp_controls,,,', 'energy_controls,,,', 'outdoor_conditions,,,,,'].join(',');
-    const headerRow2 = ['time', 'indoor_temp', 'outdoor_temp', 'target_temp', 'temp_gap', 'current_energy_w', 'target_energy_w', 'energy_gap_w', 'outdoor_temp_c', 'humidity_pct', 'wind_kmh', 'win[...]
+    const headerRow1 = ['timestamp', 'temp_controls', '', '', 'energy_controls', '', '', 'outdoor_conditions', '', '', '', '', ''].join(',');
+    const headerRow2 = ['time', 'indoor_temp', 'outdoor_temp', 'target_temp', 'temp_gap', 'current_energy_w', 'target_energy_w', 'energy_gap_w', 'outdoor_temp_c', 'humidity_pct', 'wind_kmh', 'wind_dir', 'aqi', 'rain_mm'].join(',');
     const rows = data.map(row => {
       const tGap = (row.temp - targetTemp).toFixed(2);
       const eGap = (row.energy - targetEnergy).toFixed(0);
-      return [row.time, row.temp, OUTDOOR_TEMP, targetTemp, tGap, row.energy, targetEnergy, eGap, OUTDOOR_TEMP, row.humidity, row.windSpeed, windDir, row.airQuality.toFixed(0), row.rain].join(','[...]
+      return [row.time, row.temp, OUTDOOR_TEMP, targetTemp, tGap, row.energy, targetEnergy, eGap, OUTDOOR_TEMP, row.humidity, row.windSpeed, windDir, row.airQuality.toFixed(0), row.rain].join(',');
     });
     const csvContent = [headerRow1, headerRow2, ...rows].join('\n');
     const blob = new Blob([csvContent], { type: 'text/csv' });
@@ -239,9 +239,9 @@ export default function App() {
   const energyGap = (currentEnergy - targetEnergy).toFixed(0);
 
   const getAgentThoughts = () => {
-    if (currentGapVal > 5) return { action: 'Action: Max Cooling', thought: `Gap is huge (${currentGapVal.toFixed(1)}°C). Spinning up secondary compressors to force thermal drop. Energy at ${cur[...]
-    if (currentGapVal > 2) return { action: 'Action: AC Medium', thought: `Moderate ${currentGapVal.toFixed(1)}°C gap. Modulating AC units to balance thermal load. Wind from ${windDir} at ${outd[...]
-    return { action: 'Action: Fan Only', thought: `Only ${currentGapVal.toFixed(1)}°C gap. Fan only may suffice — testing energy-efficient option. AQI is ${outdoorAQ.toFixed(0)}, intake filter[...]
+    if (currentGapVal > 5) return { action: 'Action: Max Cooling', thought: `Gap is huge (${currentGapVal.toFixed(1)}°C). Spinning up secondary compressors to force thermal drop. Energy at ${currentEnergy}W.` };
+    if (currentGapVal > 2) return { action: 'Action: AC Medium', thought: `Moderate ${currentGapVal.toFixed(1)}°C gap. Modulating AC units to balance thermal load. Wind from ${windDir} at ${outdoorWind} km/h.` };
+    return { action: 'Action: Fan Only', thought: `Only ${currentGapVal.toFixed(1)}°C gap. Fan only may suffice — testing energy-efficient option. AQI is ${outdoorAQ.toFixed(0)}, intake filters nominal.` };
   };
   const aiThought = getAgentThoughts();
 
@@ -254,7 +254,7 @@ export default function App() {
   return (
     <div className={`min-h-screen transition-colors duration-300 ${bgMain} p-4 md:p-6 font-sans`}>
       <style>{`
-        input[type='range']::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: #3b82f6; border: 2px solid #ffffff; box-shadow: 0 0 0 3px [...]
+        input[type='range']::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: #3b82f6; border: 2px solid #ffffff; box-shadow: 0 0 0 3px #3b82f6; cursor: pointer; }
         input[type='range']::-moz-range-thumb { width: 16px; height: 16px; border-radius: 50%; background: #3b82f6; border: 2px solid #ffffff; box-shadow: 0 0 0 3px #3b82f6; cursor: pointer; }
         input[type='range'].energy-slider::-webkit-slider-thumb { background: #10b981; box-shadow: 0 0 0 3px #10b981; }
         input[type='range'].energy-slider::-moz-range-thumb { background: #10b981; box-shadow: 0 0 0 3px #10b981; }
@@ -272,14 +272,14 @@ export default function App() {
             <p className={`text-xs ${textMuted} mt-0.5`}>Self-Healing Environment · Distributed Intelligence · Predictive Control</p>
           </div>
           <div className="flex flex-wrap gap-2 items-center">
-            <div className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md border text-[11px] font-mono ${wsConnected ? 'border-emerald-700 bg-emerald-500/10 text-emerald-400' : 'border-red-[...]
+            <div className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md border text-[11px] font-mono ${wsConnected ? 'border-emerald-700 bg-emerald-500/10 text-emerald-400' : 'border-red-700 bg-red-500/10 text-red-400'}`}>
               <span className={`w-1.5 h-1.5 rounded-full ${wsConnected ? 'bg-emerald-500 animate-pulse' : 'bg-red-500'}`} />
               {wsConnected ? 'Agent Live' : 'Agent Offline'}
             </div>
             <button onClick={() => setIsDark(!isDark)} className={`p-2 rounded-md border ${cardBg} hover:opacity-80 transition-opacity`}>
               {isDark ? <Sun size={16} /> : <Moon size={16} />}
             </button>
-            <button onClick={handleExport} className="flex items-center gap-2 px-3 py-2 text-xs font-medium rounded-md bg-emerald-600 text-white hover:bg-emerald-700 transition-colors border bord[...]
+            <button onClick={handleExport} className="flex items-center gap-2 px-3 py-2 text-xs font-medium rounded-md bg-emerald-600 text-white hover:bg-emerald-700 transition-colors">
               <Download size={14} /> Export CSV
             </button>
           </div>
@@ -316,7 +316,7 @@ export default function App() {
               <div className="relative w-full h-5 flex items-center">
                 <div className={`absolute w-full h-1.5 rounded-full ${isDark ? 'bg-gray-700' : 'bg-gray-300'}`} />
                 <div className="absolute h-1.5 rounded-full bg-blue-500" style={{ width: `${((targetTemp - 18) / (30 - 18)) * 100}%` }} />
-                <input type="range" min="18" max="30" step="1" value={targetTemp} onChange={(e) => setTargetTemp(Number(e.target.value))} className="absolute w-full h-1.5 rounded-full appearance-[...]
+                <input type="range" min="18" max="30" step="1" value={targetTemp} onChange={(e) => setTargetTemp(Number(e.target.value))} className="absolute w-full h-1.5 rounded-full appearance-none opacity-0 cursor-pointer" />
               </div>
             </div>
           </div>
@@ -328,7 +328,7 @@ export default function App() {
             <div className="relative w-36 h-36 mt-6">
               <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
                 <circle cx="50" cy="50" r="44" fill="none" stroke={isDark ? '#1f2937' : '#e5e7eb'} strokeWidth="7" />
-                <circle cx="50" cy="50" r="44" fill="none" stroke={latestData?.temp > targetTemp + 2 ? '#f59e0b' : '#10b981'} strokeWidth="7" strokeDasharray={`${(Math.max(0, Math.min(latestData?[...]
+                <circle cx="50" cy="50" r="44" fill="none" stroke={latestData?.temp > targetTemp + 2 ? '#f59e0b' : '#10b981'} strokeWidth="7" strokeDasharray={`${(Math.max(0, Math.min(latestData?.temp ?? 0, 30)) - 18) / (30 - 18) * 276.4},276.4`} />
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
                 <span className="text-2xl font-bold">{latestData?.temp}°C</span>
@@ -369,7 +369,7 @@ export default function App() {
               <div className="relative w-full h-5 flex items-center">
                 <div className={`absolute w-full h-1.5 rounded-full ${isDark ? 'bg-gray-700' : 'bg-gray-300'}`} />
                 <div className="absolute h-1.5 rounded-full bg-emerald-500" style={{ width: `${((targetEnergy - 300) / (1500 - 300)) * 100}%` }} />
-                <input type="range" min="300" max="1500" step="50" value={targetEnergy} onChange={(e) => setTargetEnergy(Number(e.target.value))} className="energy-slider absolute w-full h-1.5 ro[...]
+                <input type="range" min="300" max="1500" step="50" value={targetEnergy} onChange={(e) => setTargetEnergy(Number(e.target.value))} className="energy-slider absolute w-full h-1.5 rounded-full appearance-none opacity-0 cursor-pointer" />
               </div>
             </div>
           </div>
@@ -381,7 +381,7 @@ export default function App() {
             <div className="relative w-36 h-36 mt-6">
               <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
                 <circle cx="50" cy="50" r="44" fill="none" stroke={isDark ? '#1f2937' : '#e5e7eb'} strokeWidth="7" />
-                <circle cx="50" cy="50" r="44" fill="none" stroke={currentEnergy > targetEnergy ? '#f59e0b' : '#10b981'} strokeWidth="7" strokeDasharray={`${(Math.min(currentEnergy, 1500) / 1500)[...]
+                <circle cx="50" cy="50" r="44" fill="none" stroke={currentEnergy > targetEnergy ? '#f59e0b' : '#10b981'} strokeWidth="7" strokeDasharray={`${(Math.min(currentEnergy, 1500) / 1500) * 276.4},276.4`} />
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
                 <span className="text-2xl font-bold">{currentEnergy}<span className="text-sm font-normal">W</span></span>
@@ -471,7 +471,7 @@ export default function App() {
               {decisions.map((d, i) => (
                 <div key={i} className={`flex items-center justify-between py-2.5 ${i < decisions.length - 1 ? `border-b ${isDark ? 'border-gray-800' : 'border-gray-200'}` : ''}`}>
                   <div className="flex items-center gap-3">
-                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${d.good ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30' : 'bg-blue-500/15 text-blue-400 b[...]
+                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${d.good ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30' : 'bg-blue-500/15 text-blue-400 border-blue-500/30'}`}>{d.tag}</span>
                     <span className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>{d.label}</span>
                   </div>
                   <span className={`text-xs font-mono ${d.good ? 'text-emerald-500' : 'text-amber-500'}`}>{d.score}</span>
@@ -529,7 +529,7 @@ export default function App() {
                   <CartesianGrid strokeDasharray="3 3" stroke={isDark ? '#1f2937' : '#e5e7eb'} vertical={false} />
                   <XAxis dataKey="time" hide />
                   <YAxis domain={['auto', 'auto']} stroke={isDark ? '#4b5563' : '#9ca3af'} tick={{ fontSize: 10 }} width={32} />
-                  <Tooltip contentStyle={{ backgroundColor: isDark ? '#111827' : '#fff', borderColor: isDark ? '#374151' : '#e5e7eb', color: isDark ? '#f3f4f6' : '#111827', fontSize: 12, borderRa[...]
+                  <Tooltip contentStyle={{ backgroundColor: isDark ? '#111827' : '#fff', borderColor: isDark ? '#374151' : '#e5e7eb', color: isDark ? '#f3f4f6' : '#111827', fontSize: 12, borderRadius: 6 }} />
                   <ReferenceLine y={targetEnergy} stroke="#6366f1" strokeDasharray="5 5" strokeWidth={1.5}>
                     <Label value={`Target ${targetEnergy}W`} position="insideTopRight" fill="#6366f1" fontSize={10} dy={-6} />
                   </ReferenceLine>
