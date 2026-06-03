@@ -8,7 +8,6 @@ Zephyr runs a closed-loop agent that monitors indoor temperature, fetches real o
 
 ## Architecture
 
-![Flow diagram](flow.png)
 
 
 
